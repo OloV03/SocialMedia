@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: Social Media - OpenAPI 3.0
+  version: 1.0.0
+servers:
+  - url: http://localhos:8080
+tags:
+  - name: auth
+    description: Аuthorization and authentication
+  - name: users
+    description: User interaction
+  - name: posts
+    description: Operations about user
+paths:
+  /auth/signUp:
+    post:
+      tags:
+        - auth
+      summary: Registration
+      description: Registate new user and return new token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '403':
+          description: No access to the resource
+  /auth/signIn:
+    post:
+      tags:
+        - auth
+      summary: Authentication
+      description: Authentication by login&pass
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '403':
+          description: No access to the resource
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+            
+  /users/getAll:
+    get:
+      tags:
+        - users
+      summary: Finds all users
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+                type: array
+                example:
+                  - id: 1
+                    name: Jessica Smith
+                    login: JesLog
+                  - id: 2
+                    name: Ron
+                    login: HackerNor
+  /users/follow:
+    put:
+      tags:
+        - users
+      summary: Unfollow from user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TargetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /users/unfollow:
+    patch:
+      tags:
+        - users
+      summary: Follow to users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TargetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation      
+  /users/friendRequest:
+    post:
+      tags:
+        - users
+      summary: Send friend request to user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TargetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /users/approveFriend:
+    patch:
+      tags:
+        - users
+      summary: Approve friend request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TargetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation                
+  /users/deleteFriend:
+    delete:
+      tags:
+        - users
+      summary: Delete friend
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TargetRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation  
+                    
+  /posts/{userId}/getPosts:
+    get:
+      tags:
+        - posts
+      summary: Find posts (news list)
+      description: Returns a list of posts of friends and users that the current user is subscribed to
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+                type: array
+                example:
+                  - id: 1
+                    userId: 5
+                    title: Example title
+                    description: Test post for example
+                    text: '123'
+                    imgURL: ''
+                    dateCreated: '2023-01-01'
+                  - id: 2
+                    userId: 11
+                    title: Best post
+                    description: Best post ever 
+                    text: 'Post`s text'
+                    imgURL: 'https://cloud.ex/img1'
+                    dateCreated: '2023-01-15'
+  /posts/addPost:
+    post:
+      tags:
+        - posts
+      summary: Add new post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /posts/delete/{id}:
+    delete:
+      tags:
+        - posts
+      summary: Delete post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+  /posts/update/{id}:
+    patch:
+      tags:
+        - posts
+      summary: Update post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+  /posts/update:
+    patch:
+      tags:
+        - posts
+      summary: Update post
+      description: Update the number of posts per page
+      parameters:
+        - name: pageSize
+          in: query
+          description: Count post on page
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        name:
+          type: string
+          format: int64
+          example: 10
+        petId:
+          type: integer
+          format: int64
+          example: 198772
+        quantity:
+          type: integer
+          format: int32
+          example: 7
+        shipDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          description: Order Status
+          example: approved
+          enum:
+            - placed
+            - approved
+            - delivered
+        complete:
+          type: boolean
+      xml:
+        name: order
+    SignUpRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'user'
+        login:
+          type: string
+          example: 'loginEx'
+        password:
+          type: string
+          example: 'pass123'
+      xml:
+        name: signUp
+    SignInRequest:
+      type: object
+      properties:
+        login:
+          type: string
+          example: 'loginEx'
+        password:
+          type: string
+          example: 'pass123'
+      xml:
+        name: signIn
+    TargetRequest:
+      type: object
+      properties:
+        currentUserId:
+          type: integer
+          format: int64
+          example: 5
+        targetUserId:
+          type: integer
+          format: int64
+          example: 11
+      xml:
+        name: signIn
+    AuthenticationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJncmVrMSIsImlhdCI6MTY5MjYzMTAwNSwiZXhwIjoxNjkyNjMyNDQ1fQ.rBm0BPmiuadlOCLFan2tSVYZ9AAS1unPASIRVsKz7Xg'
+      xml:
+        name: authResponse

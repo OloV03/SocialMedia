@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:54132/SocialMedia
+    username: admin
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+  token: 123123123jjawcaw66669sdfsdf123123123jjawcaw66669sdfsdf
